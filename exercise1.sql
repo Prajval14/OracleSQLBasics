@@ -1,3 +1,4 @@
+--Declaring variables and output
 DECLARE
     v_test_date DATE := TO_DATE('2025-01-31', 'YYYY-MM-DD');
 BEGIN

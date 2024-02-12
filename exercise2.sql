@@ -28,6 +28,14 @@ END;
 
 -- Exercise 2
 
+-- Complete the following:
+-- Create a view called gl_stdV1 that returns the required data
+-- Create an anonymous block that:
+-- Accesses gl_stdV1
+-- Uses the %ROWTYPE attribute to define a record structure for the view data
+-- Prompts for student number and section id
+-- Output the required information
+
 CREATE OR REPLACE VIEW gl_stdV1 AS
 SELECT s.student_no, s.first_name AS student_first_name, s.last_name AS student_last_name, p.program_name, c.course_title, e.section_id, pf.first_name, pf.last_name, e.letter_grade
 FROM gl_students s
@@ -51,7 +59,7 @@ BEGIN
     FETCH FIRST 1 ROW ONLY;
     
     DBMS_OUTPUT.PUT_LINE('Student Grade: ' || TO_CHAR(SYSDATE, 'Day, Month DD, YYYY'));
-    DBMS_OUTPUT.PUT_LINE('---------------------------------------------------------');
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------------------------');
     DBMS_OUTPUT.PUT_LINE('Student: ' || v_student_record.student_first_name || ' ' || v_student_record.student_last_name);
     DBMS_OUTPUT.PUT_LINE('Major: ' || v_student_record.program_name);
     DBMS_OUTPUT.PUT_LINE('Course: ' || v_student_record.course_title);
@@ -61,3 +69,43 @@ BEGIN
 END;
 
 -- Exercise 3
+
+-- Create an anonymous block that inserts new rows into the gl_professors_copy table
+-- Declare variables using the %ROWTYPE and %TYPE attributes
+-- Use bind/host variables to prompt for the input data
+-- Allow for mixed case when entering the school code
+-- Allow for mixed case when entering the first and last names and format names with first character in upper case and the remaining character in lower case
+-- Include an INSERT statement in the execution section that inserts one row into the gl_professors_copy table
+-- Run the block three times to insert the following rows into the table:
+-- Verify the three rows were inserted correctly
+
+CREATE TABLE gl_professors_copy AS
+SELECT * FROM gl_professors;
+
+ALTER TABLE gl_professors_copy 
+ADD CONSTRAINT gl_professors_copy_pk
+PRIMARY KEY ( professor_no );
+
+DECLARE
+    v_new_professor gl_professors_copy%ROWTYPE;    
+BEGIN    
+    v_new_professor.professor_no := :ENTER_PROFESSOR_NO;
+    v_new_professor.first_name := INITCAP(:ENTER_FIRST_NAME);
+    v_new_professor.last_name := INITCAP(:ENTER_LAST_NAME);
+    v_new_professor.office_no := :ENTER_OFFICE_NO;
+    v_new_professor.office_ext := :ENTER_OFFICE_EXT;
+    v_new_professor.school_code := UPPER(:ENTER_SCHOOL_CODE);
+    INSERT INTO gl_professors_copy 
+    VALUES v_new_professor; 
+
+    DBMS_OUTPUT.PUT_LINE('Professor Added');
+    DBMS_OUTPUT.PUT_LINE('-------------------');
+    DBMS_OUTPUT.PUT_LINE('Professor no: ' || v_new_professor.professor_no);
+    DBMS_OUTPUT.PUT_LINE('First name: ' || v_new_professor.first_name);
+    DBMS_OUTPUT.PUT_LINE('Last name: ' || v_new_professor.last_name);
+    DBMS_OUTPUT.PUT_LINE('Old Office no: ' || v_new_professor.office_no);
+    DBMS_OUTPUT.PUT_LINE('Old Office ext: ' || v_new_professor.office_ext);
+    DBMS_OUTPUT.PUT_LINE('School code: ' || v_new_professor.school_code);
+
+    COMMIT;
+END;

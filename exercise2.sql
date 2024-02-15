@@ -4,8 +4,8 @@
 
 -- A. Create an anonymous block that returns the number of students in a section. Prompt for section id.
 DECLARE
-     v_sectionid INTEGER := :ENTER_SECTION_ID;
-     v_totalstudents INTEGER;
+    v_sectionid INTEGER := :ENTER_SECTION_ID;
+    v_totalstudents INTEGER;
 BEGIN
     SELECT COUNT(gl_enrollments.student_no)
     INTO v_totalstudents
@@ -16,8 +16,8 @@ END;
 
 -- B.Create an anonymous block that return the average numeric grade for a section. Prompt for section id and return the average grade. 
 DECLARE
-     v_sectionid INTEGER := :ENTER_SECTION_ID;
-     v_avggrade FLOAT;
+    v_sectionid INTEGER := :ENTER_SECTION_ID;
+    v_avggrade FLOAT;
 BEGIN
     SELECT AVG(NVL(gl_enrollments.numeric_grade, 0))
     INTO v_avggrade
@@ -37,7 +37,16 @@ END;
 -- Output the required information
 
 CREATE OR REPLACE VIEW gl_stdV1 AS
-SELECT s.student_no, s.first_name AS student_first_name, s.last_name AS student_last_name, p.program_name, c.course_title, e.section_id, pf.first_name, pf.last_name, e.letter_grade
+SELECT 
+    s.student_no, 
+    s.first_name AS student_first_name, 
+    s.last_name AS student_last_name, 
+    p.program_name, 
+    c.course_title, 
+    e.section_id, 
+    pf.first_name, 
+    pf.last_name, 
+    e.letter_grade
 FROM gl_students s
 JOIN gl_programs p ON p.program_code = s.major_code
 JOIN gl_courses c ON c.program_code = p.program_code
@@ -55,8 +64,7 @@ BEGIN
     INTO v_student_record
     FROM gl_stdV1
     WHERE gl_stdV1.student_no = v_studentno
-    AND gl_stdV1.section_id = v_sectionid
-    FETCH FIRST 1 ROW ONLY;
+    AND gl_stdV1.section_id = v_sectionid;
     
     DBMS_OUTPUT.PUT_LINE('Student Grade: ' || TO_CHAR(SYSDATE, 'Day, Month DD, YYYY'));
     DBMS_OUTPUT.PUT_LINE('----------------------------------------------------------');

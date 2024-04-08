@@ -1,0 +1,68 @@
+-- STUDENT NAME: PRAJVAL PATEL (C0911611) AND URVESH PATEL (C0903445)
+
+-- Question 1
+DROP TABLE GL_PROFESSORS_COPY;
+
+CREATE TABLE PROFESSORS_COPY AS
+(SELECT PROFESSOR_NO, FIRST_NAME, LAST_NAME, OFFICE_EXT, OFFICE_NO
+FROM GL_PROFESSORS);
+
+ALTER TABLE PROFESSORS_COPY
+ADD PRIMARY KEY(PROFESSOR_NO);
+
+-- Question 2
+CREATE OR REPLACE PACKAGE college_pkg IS
+    V_PROFESSOR_DATA PROFESSORS_COPY%ROWTYPE;
+    PROCEDURE get_professor(P_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE);
+END college_pkg;
+
+CREATE OR REPLACE PACKAGE BODY college_pkg IS
+    -- Question 4
+    FUNCTION validate_get_professor(P_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE) RETURN BOOLEAN IS
+        v_count NUMBER;
+    BEGIN
+        SELECT COUNT(*)
+        INTO v_count
+        FROM PROFESSORS_COPY
+        WHERE PROFESSOR_NO = P_PROFESSOR_NO;
+
+        IF v_count > 0 THEN
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END validate_get_professor;
+
+    -- Question 3
+    PROCEDURE get_professor(P_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE) IS
+    BEGIN
+        IF validate_get_professor(P_PROFESSOR_NO) THEN
+            SELECT *
+            INTO V_PROFESSOR_DATA
+            FROM PROFESSORS_COPY
+            WHERE PROFESSOR_NO = P_PROFESSOR_NO;
+
+            DBMS_OUTPUT.PUT_LINE('No: ' || V_PROFESSOR_DATA.PROFESSOR_NO);
+            DBMS_OUTPUT.PUT_LINE('Name: ' || V_PROFESSOR_DATA.FIRST_NAME || ' ' || V_PROFESSOR_DATA.LAST_NAME);
+            DBMS_OUTPUT.PUT_LINE('Office ext: ' || V_PROFESSOR_DATA.OFFICE_EXT);
+            DBMS_OUTPUT.PUT_LINE('Office no: ' || V_PROFESSOR_DATA.OFFICE_NO);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Professor ' || P_PROFESSOR_NO || ' does not exist in the professors table.');
+        END IF;
+    END get_professor;
+
+    -- PROCEDURE add_professor(P_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE) IS
+    -- BEGIN
+    -- END add_professor;
+
+    -- PROCEDURE delete_professor(P_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE) IS
+    -- BEGIN
+    -- END delete_professor;
+END college_pkg;
+
+DECLARE
+    V_PROFESSOR_NO PROFESSORS_COPY.PROFESSOR_NO%TYPE := :ENTER_PROFESSOR_NO;
+BEGIN
+    college_pkg.get_professor(V_PROFESSOR_NO);
+END;
+
